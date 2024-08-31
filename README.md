@@ -4,12 +4,12 @@ Pageturner is a modern bookstore website designed to provide an exceptional user
 
 ## Preview
 
-![Screenshot 2024-07-25 142019](https://github.com/user-attachments/assets/d56c5312-921f-474c-ad11-c41cdf6dd62f)
-![Screenshot 2024-07-25 142952](https://github.com/user-attachments/assets/7c59cc5f-df07-4818-90c2-a8a6806e96dd)
-![Screenshot 2024-07-25 142925](https://github.com/user-attachments/assets/e2aeec6d-d474-4e06-95ca-cf9fbc1ba45e)
-![Screenshot 2024-07-25 142330](https://github.com/user-attachments/assets/50531d54-f9a8-4ef8-94c1-2bf84b08c459)
-![Screenshot 2024-07-25 141147](https://github.com/user-attachments/assets/cc091e8b-ab4c-4a32-886d-4e89a4744cc0)
-![Screenshot 2024-07-25 142312](https://github.com/user-attachments/assets/ccdc2920-9104-4a48-becf-c4a13429182f)
+![Screenshot 2024-09-01 022449](https://github.com/user-attachments/assets/aa484c43-ae53-42a3-afa2-b3b7a7747436)
+![Screenshot 2024-09-01 022502](https://github.com/user-attachments/assets/8227a9d3-a25a-49c0-b104-ae0751b19cbd)
+![Screenshot 2024-09-01 022553](https://github.com/user-attachments/assets/60f32507-9bf3-4ebd-9f0c-3405a07ab2b7)
+![Screenshot 2024-09-01 022656](https://github.com/user-attachments/assets/30602b75-ad8f-4d6b-b835-96ab79c7b1bb)
+![Screenshot 2024-09-01 022721](https://github.com/user-attachments/assets/b160e894-be08-43b6-ba6c-57574da74969)
+
 
 ## Features
 
