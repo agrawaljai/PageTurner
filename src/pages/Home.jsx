@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useFirebase } from '../context/Firebase';
 import BookCard from "../components/Card";
 import CardGroup from 'react-bootstrap/CardGroup';
-import Alert from 'react-bootstrap/Alert';
 
 
 const Homepage = () => {

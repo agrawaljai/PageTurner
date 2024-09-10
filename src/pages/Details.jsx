@@ -26,7 +26,7 @@ const BookDetail = () => {
             firebase.getImageUrl(imageURL).then((url) => setUrl(url));
         }
 
-    },[]);
+    },);
 
     const placeOrder = async() => {
         const result = await firebase.placeOrder(params.bookId, qty, data.price);
@@ -38,7 +38,7 @@ const BookDetail = () => {
         
        <div className="details">
         <h1 style={{textAlign: 'center', fontWeight: 'bolder', color: 'white', margin: '4vh'}}>{data.name}</h1>
-        <img src={url} style={{width: '40%', borderRadius: '5vh', display: 'block',marginTop: '2vh', margin: 'auto'}}  />
+        <img src={url} style={{width: '40%', borderRadius: '5vh', display: 'block',marginTop: '2vh', margin: 'auto'}} alt="Some Image" />
         <h1 style={{textAlign: 'left', color: 'white', marginTop: '4vh', marginBottom: '4vh'}}>Details - </h1>
         <p style={{fontSize: '4vh', marginLeft: '2vw'}}>Price: Rs. {data.price}</p>
         <p style={{fontSize: '4vh', marginLeft: '2vw'}}>Enter Quantity :-</p>
