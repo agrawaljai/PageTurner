@@ -1,0 +1,173 @@
+.CardtoDisplay:hover { 
+    transform: scale(1.05);
+    z-index: 1;
+}
+
+.container {
+    margin: 0px;
+}
+
+.main {
+    background-color: #EEEEEE;
+    margin: 0px;
+    height: 100%;
+    width: 100%;
+}
+
+.CardtoDisplay {
+    background-color: #222831;
+
+}
+
+#first {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url("../public/bagd.jpg");
+    background-size: cover;
+    background-color: black ;
+    height: 90vh;
+    width: 100vw;
+    padding-top: 25vh;
+    
+}
+
+.text1 {
+    filter: brightness(200%);
+    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+    color: white;
+    font-size: 10vh;
+    text-align: center;
+}
+.text2 {
+    color: white;
+    margin-top: 0px;
+    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+    font-size: 20vh;
+    text-align: center;
+}
+
+.home {
+    background-color: #31363F ;
+    box-shadow: rgba(6, 24, 44, 0.4) 0px 0px 0px 2px, rgba(6, 24, 44, 0.65) 0px 4px 6px -1px, rgba(255, 255, 255, 0.08) 0px 1px 0px inset;
+    padding-bottom: 3vh;
+    width: 95vw;
+    padding: 5vh;
+    margin-top: 5vh;
+    margin-left: 5vh;
+    margin-right: 5vh;
+    border-radius: 5vh;
+    margin-bottom: 3vh;
+}
+
+.footer {
+    position: relative;
+    bottom: 0;
+    left: 0;
+    margin-top: 2vh;
+    width: 100vw;
+    height: 20vh;
+    background-color: #2B3035;
+    padding: 1vh;
+    color: #C9CBCC;
+}
+.up {
+    display: flex;
+    height: 50%;
+    justify-content: space-between;
+    font-size: 10%;
+    padding: 2vh;
+}
+#left {
+    text-align: left;
+    margin-left: 7vw;
+    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+    color: white;
+}
+
+
+#right {
+    display: flex;
+    justify-content: space-between;
+    font-family: Arial, Helvetica, sans-serif;
+    
+    margin-right: 7vw;
+}
+.down {
+    text-align: center;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    height: 50%;
+    margin-left: 5%;
+    margin-right: 5%;
+    width: 90%;
+    padding: 2vh;
+    border-top: 1px solid white;
+    font-size: 20%;
+
+}
+.listing {
+    background-color: #222831;
+    width: 50vw;
+    box-shadow: rgba(6, 24, 44, 0.4) 0px 0px 0px 2px, rgba(6, 24, 44, 0.65) 0px 4px 6px -1px, rgba(255, 255, 255, 0.08) 0px 1px 0px inset;
+    margin: 4vh auto;
+    padding: 6vh;
+    padding-inline: 25vh;
+    color: white;
+    border-radius: 5vh;
+}
+
+.orders_map {
+    background-color: #31363F ;
+    box-shadow: rgba(6, 24, 44, 0.4) 0px 0px 0px 2px, rgba(6, 24, 44, 0.65) 0px 4px 6px -1px, rgba(255, 255, 255, 0.08) 0px 1px 0px inset;   
+    padding-bottom: 3vh;
+    width: 95vw;
+    padding: 5vh;
+    margin-top: 5vh;
+    margin-left: 5vh;
+    margin-right: 5vh;
+    border-radius: 5vh;
+    margin-bottom: 3vh;
+
+}
+
+.details {
+    background-color: #2B3035;
+    margin: 5vh;
+    padding: 5vh;
+    padding-left: 5vw;
+    color: white;
+    border-radius: 5vh;
+    box-shadow: rgba(6, 24, 44, 0.4) 0px 0px 0px 2px, rgba(6, 24, 44, 0.65) 0px 4px 6px -1px, rgba(255, 255, 255, 0.08) 0px 1px 0px inset;
+    
+}
+
+.orders {
+    width: 80vw;
+    min-height: 60vh;
+    margin: auto;
+    background-color: #31363F;
+    padding: 8vh;
+    border-radius: 5vh;
+    color: whitesmoke;
+    box-shadow: rgba(6, 24, 44, 0.4) 0px 0px 0px 2px, rgba(6, 24, 44, 0.65) 0px 4px 6px -1px, rgba(255, 255, 255, 0.08) 0px 1px 0px inset;
+    
+}
+
+.login {
+    background-color: #222831;
+    width: 50vw;
+    box-shadow: rgba(6, 24, 44, 0.4) 0px 0px 0px 2px, rgba(6, 24, 44, 0.65) 0px 4px 6px -1px, rgba(255, 255, 255, 0.08) 0px 1px 0px inset;
+    margin: 4vh auto;
+    padding: 6vh;
+    padding-inline: 25vh;
+    color: white;
+    border-radius: 5vh;
+}
+
+.register {
+    background-color: #222831;
+    width: 50vw;
+    box-shadow: rgba(6, 24, 44, 0.4) 0px 0px 0px 2px, rgba(6, 24, 44, 0.65) 0px 4px 6px -1px, rgba(255, 255, 255, 0.08) 0px 1px 0px inset;
+    margin: 4vh auto;
+    padding: 6vh;
+    padding-inline: 25vh;
+    color: white;
+    border-radius: 5vh;
+}
