@@ -4,6 +4,8 @@ Pageturner is a modern bookstore website designed to provide an exceptional user
 
 ## Preview
 
+https://pageturner-46efa.web.app/
+
 ![Screenshot 2024-09-01 022449](https://github.com/user-attachments/assets/aa484c43-ae53-42a3-afa2-b3b7a7747436)
 ![Screenshot 2024-09-01 022502](https://github.com/user-attachments/assets/8227a9d3-a25a-49c0-b104-ae0751b19cbd)
 ![Screenshot 2024-09-01 022553](https://github.com/user-attachments/assets/60f32507-9bf3-4ebd-9f0c-3405a07ab2b7)
