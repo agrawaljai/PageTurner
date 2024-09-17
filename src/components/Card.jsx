@@ -20,7 +20,7 @@ const BookCard = (props) => {
     return (
         
 
-        <Card className="CardtoDisplay mt-4" style={{ width: '18rem', maxWidth: '30vw', border: '.5px', borderRadius: '2vh', maxHeight: '200%', boxShadow: 'rgba(100, 100, 111, 0.2) 0px 7px 29px 0px', margin: '6px',transition: 'transform .2s', }}>
+        <Card className="CardtoDisplay mt-4" style={{ minWidth: '18rem', maxWidth: '30vw', border: '.5px', borderRadius: '2vh', maxHeight: '200%', boxShadow: 'rgba(100, 100, 111, 0.2) 0px 7px 29px 0px', margin: '6px',transition: 'transform .2s', }}>
             <Card.Img style={{width: '100%', height: '40%', objectFit: 'cover', borderTopLeftRadius: '2vh', borderTopRightRadius: '2vh'}} variant="top" src={url} />
             <Card.Body>
                 <Card.Title style={{color: 'white', fontSize: '3vh'}}>{props.name}</Card.Title>
