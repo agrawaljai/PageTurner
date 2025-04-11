@@ -1,53 +1,121 @@
 import React, { useState } from "react";
-import Button from 'react-bootstrap/Button';
-import Form from 'react-bootstrap/Form';
-import { useFirebase } from '../context/Firebase';
+import { useFirebase } from "../context/Firebase";
 import { useNavigate } from "react-router-dom";
+import LoadingOverlay from "../components/LoadingOverlay";
 
 const ListingForm = () => {
-
     const firebase = useFirebase();
     const navigate = useNavigate();
+    
+    const [name, setName] = useState("");
+    const [isbn, setIsbn] = useState("");
+    const [price, setPrice] = useState("");
+    const [coverImg, setCoverImg] = useState(null);
+    const [category, setCategory] = useState("Fiction");
+    const [error, setError] = useState("");
 
-    const [name, setName] = useState('');
-    const [isbnNumber, setIsbnNumber] = useState('');
-    const [price, setPrice] = useState('');
-    const [coverPic, setCoverPic] = useState('');
-
-    const handleSubmit = async(e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        await firebase.handleCreateNewListing(name, isbnNumber, price, coverPic);
-        navigate("/");
+        
+        // Basic validation
+        if (!name || !isbn || !price || !coverImg) {
+            setError("All fields are required");
+            return;
+        }
+        
+        if (isNaN(price) || price <= 0) {
+            setError("Price must be a valid number greater than 0");
+            return;
+        }
+        
+        try {
+            await firebase.handleCreateNewListing(name, isbn, price, coverImg, category);
+            // Navigate to home or books list after successful submission
+            navigate("/");
+        } catch (error) {
+            console.error("Error creating listing:", error);
+            setError("Failed to create listing. Please try again.");
+        }
     };
+
     return (
-        <div className="listing mt-4">
-            <h2 style={{textAlign: 'center', fontWeight: 'bolder'}}>ADD LISTING</h2>
-            <Form>
-                <Form.Group className="mb-3" controlId="formBasicEmail">
-                    <Form.Label>Enter Book Name</Form.Label>
-                    <Form.Control onChange={(e) => setName(e.target.value)} value={name} type="text" placeholder="Enter Book Title" />
-                    
-                </Form.Group>
-
-                <Form.Group className="mb-3" controlId="formBasicPassword">
-                    <Form.Label>ISBN Number</Form.Label>
-                    <Form.Control onChange={(e) => setIsbnNumber(e.target.value)} value={isbnNumber} type="number" placeholder="Enter ISBN Number" />
-                </Form.Group>
-
-                <Form.Group className="mb-3" controlId="formBasicPassword">
-                    <Form.Label>Price</Form.Label>
-                    <Form.Control onChange={(e) => setPrice(e.target.value)} value={price} type="number" placeholder="Enter Price" />
-                </Form.Group>
-
-                <Form.Group className="mb-3" controlId="formBasicPassword">
-                    <Form.Label>Photo</Form.Label>
-                    <Form.Control onChange={(e) => setCoverPic(e.target.files[0])} type="file" />
-                </Form.Group>
+        <div className="listing">
+            {firebase.isSubmitting && <LoadingOverlay message="Uploading your book listing..." />}
+            
+            <h1>List a Book for Sale</h1>
+            
+            {error && (
+                <div className="error-message">
+                    {error}
+                </div>
+            )}
+            
+            <form onSubmit={handleSubmit}>
+                <div className="form-group">
+                    <label>Book Name</label>
+                    <input
+                        type="text"
+                        placeholder="Enter book name"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                    />
+                </div>
                 
-                <Button onClick={handleSubmit} variant="primary" type="submit">
-                    List
-                </Button>
-            </Form>
+                <div className="form-group">
+                    <label>ISBN</label>
+                    <input
+                        type="text"
+                        placeholder="Enter ISBN"
+                        value={isbn}
+                        onChange={(e) => setIsbn(e.target.value)}
+                    />
+                </div>
+                
+                <div className="form-group">
+                    <label>Price ($)</label>
+                    <input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        placeholder="Enter price"
+                        value={price}
+                        onChange={(e) => setPrice(e.target.value)}
+                    />
+                </div>
+                
+                <div className="form-group">
+                    <label>Category</label>
+                    <select
+                        value={category}
+                        onChange={(e) => setCategory(e.target.value)}
+                    >
+                        <option value="Fiction">Fiction</option>
+                        <option value="Non-Fiction">Non-Fiction</option>
+                        <option value="Mystery">Mystery</option>
+                        <option value="Sci-Fi & Fantasy">Sci-Fi & Fantasy</option>
+                        <option value="Biography">Biography</option>
+                    </select>
+                </div>
+                
+                <div className="form-group">
+                    <label>Cover Image</label>
+                    <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => setCoverImg(e.target.files[0])}
+                    />
+                    <p className="file-tip">
+                        Recommended size: 300x450 pixels
+                    </p>
+                </div>
+                
+                <button
+                    type="submit"
+                    className="submit-button"
+                >
+                    Create Listing
+                </button>
+            </form>
         </div>
     );
 };
