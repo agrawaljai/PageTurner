@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useFirebase } from '../context/Firebase';
 import BookCard from "../components/Card";
+import { collection, onSnapshot } from "firebase/firestore"; // Import onSnapshot
 
 const Homepage = () => {
     const firebase = useFirebase();
@@ -12,12 +13,27 @@ const Homepage = () => {
     const [activeCategory, setActiveCategory] = useState("All");
     const [sortOption, setSortOption] = useState("default");
 
-    // Load all books initially
+    // Set up a real-time listener for book collection changes
     useEffect(() => {
-        firebase.listAllBooks().then((books) => {
-            const allBooks = books.docs;
+        setIsLoading(true);
+        
+        // Get reference to the firestore instance
+        const firestore = firebase.getFirestore();
+        
+        // Set up the snapshot listener
+        const unsubscribe = onSnapshot(collection(firestore, "books"), (snapshot) => {
+            const allBooks = snapshot.docs;
             setBooks(allBooks);
-            setFilteredBooks(allBooks);
+            
+            // Apply current filters and search
+            if (activeCategory !== "All") {
+                const categoryBooks = allBooks.filter(
+                    book => book.data().category === activeCategory
+                );
+                setFilteredBooks(categoryBooks);
+            } else {
+                setFilteredBooks(allBooks);
+            }
             
             // Get a few random books for featured section
             if (allBooks.length > 3) {
@@ -28,11 +44,14 @@ const Homepage = () => {
             }
             
             setIsLoading(false);
-        }).catch(err => {
-            console.error("Error fetching books:", err);
+        }, (error) => {
+            console.error("Error fetching books:", error);
             setIsLoading(false);
         });
-    }, [firebase]);
+        
+        // Clean up listener on component unmount
+        return () => unsubscribe();
+    }, [firebase, activeCategory]);
 
     // Handle search
     const handleSearch = async (e) => {
@@ -43,7 +62,9 @@ const Homepage = () => {
             if (activeCategory === "All") {
                 setFilteredBooks(books);
             } else {
-                const categoryBooks = await firebase.getBooksByCategory(activeCategory);
+                const categoryBooks = books.filter(
+                    book => book.data().category === activeCategory
+                );
                 setFilteredBooks(categoryBooks);
             }
             return;
@@ -82,8 +103,10 @@ const Homepage = () => {
                     setFilteredBooks(books);
                 }
             } else {
-                // Get books by category
-                const categoryBooks = await firebase.getBooksByCategory(category);
+                // Filter books by category from local state
+                const categoryBooks = books.filter(
+                    book => book.data().category === category
+                );
                 
                 // Apply search filter if there's a search term
                 if (searchTerm.trim()) {
@@ -146,6 +169,7 @@ const Homepage = () => {
 
     return (
         <div className="homepage">
+            {/* Rest of your component remains the same */}
             {/* Hero Banner */}
             <section className="hero">
                 <div className="hero-content">

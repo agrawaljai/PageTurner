@@ -6,7 +6,7 @@ import LoadingOverlay from "../components/LoadingOverlay";
 const ListingForm = () => {
     const firebase = useFirebase();
     const navigate = useNavigate();
-    
+
     const [name, setName] = useState("");
     const [isbn, setIsbn] = useState("");
     const [price, setPrice] = useState("");
@@ -14,23 +14,43 @@ const ListingForm = () => {
     const [category, setCategory] = useState("Fiction");
     const [error, setError] = useState("");
 
+    const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/dvbty9y9x/image/upload";
+    const UPLOAD_PRESET = "book_covers";
+
+    const uploadImageToCloudinary = async (file) => {
+        const formData = new FormData();
+        formData.append("file", file);
+        formData.append("upload_preset", UPLOAD_PRESET);
+
+        const response = await fetch(CLOUDINARY_URL, {
+            method: "POST",
+            body: formData,
+        });
+
+        const data = await response.json();
+        if (!response.ok) {
+            throw new Error(data.error?.message || "Image upload failed");
+        }
+        return data.secure_url;
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
-        // Basic validation
+
         if (!name || !isbn || !price || !coverImg) {
             setError("All fields are required");
             return;
         }
-        
+
         if (isNaN(price) || price <= 0) {
             setError("Price must be a valid number greater than 0");
             return;
         }
-        
+
         try {
-            await firebase.handleCreateNewListing(name, isbn, price, coverImg, category);
-            // Navigate to home or books list after successful submission
+            setError("");
+            const imageUrl = await uploadImageToCloudinary(coverImg);
+            await firebase.handleCreateNewListing(name, isbn, price, imageUrl, category);
             navigate("/");
         } catch (error) {
             console.error("Error creating listing:", error);
@@ -41,15 +61,11 @@ const ListingForm = () => {
     return (
         <div className="listing">
             {firebase.isSubmitting && <LoadingOverlay message="Uploading your book listing..." />}
-            
+
             <h1>List a Book for Sale</h1>
-            
-            {error && (
-                <div className="error-message">
-                    {error}
-                </div>
-            )}
-            
+
+            {error && <div className="error-message">{error}</div>}
+
             <form onSubmit={handleSubmit}>
                 <div className="form-group">
                     <label>Book Name</label>
@@ -60,7 +76,7 @@ const ListingForm = () => {
                         onChange={(e) => setName(e.target.value)}
                     />
                 </div>
-                
+
                 <div className="form-group">
                     <label>ISBN</label>
                     <input
@@ -70,7 +86,7 @@ const ListingForm = () => {
                         onChange={(e) => setIsbn(e.target.value)}
                     />
                 </div>
-                
+
                 <div className="form-group">
                     <label>Price ($)</label>
                     <input
@@ -82,7 +98,7 @@ const ListingForm = () => {
                         onChange={(e) => setPrice(e.target.value)}
                     />
                 </div>
-                
+
                 <div className="form-group">
                     <label>Category</label>
                     <select
@@ -96,7 +112,7 @@ const ListingForm = () => {
                         <option value="Biography">Biography</option>
                     </select>
                 </div>
-                
+
                 <div className="form-group">
                     <label>Cover Image</label>
                     <input
@@ -104,15 +120,10 @@ const ListingForm = () => {
                         accept="image/*"
                         onChange={(e) => setCoverImg(e.target.files[0])}
                     />
-                    <p className="file-tip">
-                        Recommended size: 300x450 pixels
-                    </p>
+                    <p className="file-tip">Recommended size: 300x450 pixels</p>
                 </div>
-                
-                <button
-                    type="submit"
-                    className="submit-button"
-                >
+
+                <button type="submit" className="submit-button">
                     Create Listing
                 </button>
             </form>

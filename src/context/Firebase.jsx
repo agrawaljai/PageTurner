@@ -2,8 +2,7 @@ import { createContext, useContext, useState, useEffect } from "react";
 import { initializeApp } from 'firebase/app';
 import { createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from 'firebase/auth';
 import { addDoc, collection, deleteDoc, doc, getDoc, getDocs, getFirestore, query, where } from "firebase/firestore";
-import { getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage';
-
+import axios from "axios";
 
 const FirebaseContext = createContext(null);
 
@@ -15,11 +14,10 @@ const firebaseConfig = {
     messagingSenderId: "363501343811",
     appId: "1:363501343811:web:0260da0d2c5db0a0a1f0f6"
 };
-  
-const firebaseApp = initializeApp(firebaseConfig);  
+
+const firebaseApp = initializeApp(firebaseConfig);
 const firebaseAuth = getAuth(firebaseApp);
 const firestore = getFirestore(firebaseApp);
-const storage = getStorage(firebaseApp);
 
 const googleProvider = new GoogleAuthProvider();
 
@@ -32,37 +30,49 @@ export const FirebaseProvider = (props) => {
 
     useEffect(() => {
         onAuthStateChanged(firebaseAuth, user => {
-            if(user) setUser(user);
+            if (user) setUser(user);
             else setUser(null);
         });
     }, []);
 
-    
     const signupUserWithEmailAndPassword = (email, password) => createUserWithEmailAndPassword(firebaseAuth, email, password); 
-    
     const signinUserWithEmailAndPassword = (email, password) => signInWithEmailAndPassword(firebaseAuth, email, password);
-    
     const signinWithGoogle = () => signInWithPopup(firebaseAuth, googleProvider);
 
+    // Modify the handleCreateNewListing function to use Cloudinary for image upload
     const handleCreateNewListing = async(name, isbn, price, cover, category = "Fiction") => {
         try {
             setIsSubmitting(true);
-            const imageRef = ref(storage, `uploads/images/${Date.now()}-${cover.name}` );
-            const uploadResult = await uploadBytes(imageRef, cover);
-            const result = await addDoc(collection(firestore, 'books'), {
-                name, 
-                isbn,
-                price,
-                category,
-                imageURL: uploadResult.ref.fullPath,
-                userID: user.uid,
-                userEmail: user.email, 
-                displayName: user.displayName,
-                photoURL: user.photoURL,
-                createdAt: new Date().toISOString()
-            });
-            setIsSubmitting(false);
-            return result;
+
+            // Create FormData to send image as multipart/form-data to Cloudinary
+            const formData = new FormData();
+            formData.append("file", cover); // Append the cover image
+            formData.append("upload_preset", "book_covers"); // Cloudinary preset (create this in Cloudinary console)
+
+            // Send image to Cloudinary and get the response
+            const response = await axios.post("https://api.cloudinary.com/v1_1/dvbty9y9x/image/upload", formData);
+
+            if (response.status === 200) {
+                const imageUrl = response.data.secure_url; // Get image URL from Cloudinary response
+
+                // Store the new book data in Firestore
+                const result = await addDoc(collection(firestore, 'books'), {
+                    name,
+                    isbn,
+                    price,
+                    category,
+                    imageURL: imageUrl, // Store Cloudinary image URL
+                    userID: user.uid,
+                    userEmail: user.email,
+                    displayName: user.displayName,
+                    photoURL: user.photoURL,
+                    createdAt: new Date().toISOString()
+                });
+                setIsSubmitting(false);
+                return result;
+            } else {
+                throw new Error("Image upload failed");
+            }
         } catch (error) {
             setIsSubmitting(false);
             throw error;
@@ -72,7 +82,7 @@ export const FirebaseProvider = (props) => {
     const handleDeleteListing = async(id) => {
         const docRef = doc(firestore, 'books', id);
         const result = await getDoc(docRef);
-        if(result.data().userID !== user.uid) {
+        if (result.data().userID !== user.uid) {
             return alert("User Not Authorized");
         } else {
             return await deleteDoc(docRef).then(() => console.log("doc deleted")).catch((e) => alert(e));
@@ -83,12 +93,10 @@ export const FirebaseProvider = (props) => {
         return getDocs(collection(firestore, "books")); 
     }
 
-    // New function to search books by name, isbn, or author
     const searchBooks = async(searchTerm) => {
         const booksSnapshot = await getDocs(collection(firestore, "books"));
         const searchTermLower = searchTerm.toLowerCase();
         
-        // Filter books that match the search term
         const filteredBooks = booksSnapshot.docs.filter(doc => {
             const data = doc.data();
             return data.name.toLowerCase().includes(searchTermLower) || 
@@ -99,7 +107,6 @@ export const FirebaseProvider = (props) => {
         return filteredBooks;
     }
     
-    // New function to get books by category
     const getBooksByCategory = async(category) => {
         const collectionRef = collection(firestore, "books");
         const q = query(collectionRef, where("category", '==', category));
@@ -112,13 +119,15 @@ export const FirebaseProvider = (props) => {
         const result = await getDoc(docRef);
         return result;
     }
-    
-    const getImageUrl = (path) => {
-        return getDownloadURL(ref(storage, path));
-    } 
+
+    // Cloudinary doesn't need to store the path, the URL is directly used from the response
+    const getImageUrl = async (imageUrl) => {
+        return imageUrl;
+    };
+      
 
     const placeOrder = async(bookId, qty, amount) => {
-        const collectionRef = collection(firestore, 'books', bookId, "orders" );
+        const collectionRef = collection(firestore, 'books', bookId, "orders");
         await addDoc(collectionRef, {
             userID: user.uid,
             userEmail: user.email, 
@@ -151,6 +160,9 @@ export const FirebaseProvider = (props) => {
           setUser(null);
         });   
     }
+    const getFirestore = () => {
+        return firestore;
+    };
 
     return (
         <FirebaseContext.Provider value={{
@@ -170,6 +182,7 @@ export const FirebaseProvider = (props) => {
             isLoggedIn,
             isSubmitting,
             user,
+            getFirestore,
             logout
         }}>
             {props.children}
