@@ -9,10 +9,24 @@ const MyNavbar = () => {
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
     const [isSearchVisible, setIsSearchVisible] = useState(false);
+    const [windowWidth, setWindowWidth] = useState(window.innerWidth);
     const dropdownRef = useRef(null);
     const searchRef = useRef(null);
     
     const user = firebase.user;
+    const isMobile = windowWidth <= 768;
+    
+    // Handle window resize
+    useEffect(() => {
+        const handleResize = () => {
+            setWindowWidth(window.innerWidth);
+        };
+        
+        window.addEventListener('resize', handleResize);
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, []);
     
     const handleLogout = async() => {
         await firebase.logout().then(() => {
@@ -44,6 +58,132 @@ const MyNavbar = () => {
             document.removeEventListener("mousedown", handleClickOutside);
         };
     }, [isSearchVisible]);
+
+    // Mobile menu styles
+    const mobileMenuStyle = {
+        display: isMobile ? (isMenuOpen ? 'flex' : 'none') : 'flex',
+        position: isMobile ? 'absolute' : 'static',
+        top: isMobile ? '70px' : 'auto',
+        left: isMobile ? 0 : 'auto',
+        right: isMobile ? 0 : 'auto',
+        flexDirection: isMobile ? 'column' : 'row',
+        backgroundColor: 'white',
+        padding: isMobile ? '1rem' : 0,
+        boxShadow: isMobile ? '0 4px 6px rgba(0, 0, 0, 0.1)' : 'none',
+        zIndex: 50,
+        alignItems: 'center',
+    };
+
+    // Mobile menu button style
+    const mobileMenuButtonStyle = {
+        display: isMobile ? 'block' : 'none',
+        cursor: 'pointer',
+    };
+
+    // Navigation list style
+    const navListStyle = {
+        display: 'flex',
+        listStyle: 'none',
+        margin: 0,
+        padding: 0,
+        flexDirection: isMobile ? 'column' : 'row',
+        width: isMobile ? '100%' : 'auto',
+    };
+
+    // Search container style
+    const searchContainerStyle = {
+        position: 'relative',
+        marginLeft: isMobile ? 0 : '1rem',
+        display: 'flex',
+        alignItems: 'center',
+        width: isMobile ? '100%' : 'auto',
+        marginTop: isMobile ? '0.5rem' : 0,
+        marginBottom: isMobile ? '0.5rem' : 0,
+    };
+
+    // User authentication container style
+    const authContainerStyle = {
+        marginLeft: isMobile ? 0 : '1rem',
+        position: 'relative',
+        width: isMobile ? '100%' : 'auto',
+    };
+
+    // Desktop search icon style
+    const desktopSearchIconStyle = {
+        background: 'none',
+        border: 'none',
+        cursor: 'pointer',
+        padding: '8px',
+        color: '#333',
+        display: isMobile ? 'none' : 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+    };
+
+    // Mobile search form style
+    const mobileSearchFormStyle = {
+        display: isMobile ? 'flex' : 'none',
+        width: '100%',
+    };
+
+    // Desktop search dropdown style
+    const desktopSearchDropdownStyle = {
+        position: 'absolute',
+        top: '100%',
+        right: '0',
+        backgroundColor: 'white',
+        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+        borderRadius: '4px',
+        padding: '0.5rem',
+        width: '260px',
+        zIndex: 100,
+        display: isSearchVisible && !isMobile ? 'flex' : 'none',
+    };
+
+    // User profile button style
+    const userProfileButtonStyle = {
+        background: 'none',
+        border: 'none',
+        color: '#333',
+        display: 'flex',
+        alignItems: 'center',
+        cursor: 'pointer',
+        padding: '0.5rem 0.75rem',
+        borderRadius: '4px',
+        fontSize: '0.95rem',
+        fontWeight: '500',
+        width: isMobile ? '100%' : 'auto',
+        justifyContent: isMobile ? 'space-between' : 'flex-start',
+        borderTop: isMobile ? '1px solid #edf2f7' : 'none',
+        marginTop: isMobile ? '0.5rem' : 0,
+        paddingTop: isMobile ? '1rem' : '0.5rem',
+    };
+
+    // User dropdown style
+    const userDropdownStyle = {
+        position: isMobile ? 'relative' : 'absolute',
+        top: isMobile ? 'auto' : '100%',
+        right: 0,
+        backgroundColor: 'white',
+        boxShadow: isMobile ? 'none' : '0 4px 8px rgba(0, 0, 0, 0.1)',
+        borderRadius: '4px',
+        minWidth: '180px',
+        width: isMobile ? '100%' : 'auto',
+        marginTop: isMobile ? '0.5rem' : 0,
+        zIndex: 100,
+        display: isDropdownOpen ? 'block' : 'none',
+    };
+
+    // Guest auth buttons container style
+    const guestAuthButtonsStyle = {
+        display: 'flex',
+        gap: '0.5rem',
+        width: isMobile ? '100%' : 'auto',
+        justifyContent: isMobile ? 'space-between' : 'flex-start',
+        marginTop: isMobile ? '1rem' : 0,
+        borderTop: isMobile ? '1px solid #edf2f7' : 'none',
+        paddingTop: isMobile ? '1rem' : 0,
+    };
 
     return (
         <nav style={{
@@ -81,13 +221,7 @@ const MyNavbar = () => {
                 
                 {/* Mobile Menu Button */}
                 <div 
-                    style={{
-                        display: 'none',
-                        cursor: 'pointer',
-                        '@media (max-width: 768px)': {
-                            display: 'block',
-                        }
-                    }}
+                    style={mobileMenuButtonStyle}
                     onClick={() => setIsMenuOpen(!isMenuOpen)}
                 >
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" 
@@ -102,33 +236,9 @@ const MyNavbar = () => {
                     </svg>
                 </div>
                 
-                {/* Desktop Navigation */}
-                <div style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    '@media (max-width: 768px)': {
-                        display: isMenuOpen ? 'flex' : 'none',
-                        position: 'absolute',
-                        top: '70px',
-                        left: 0,
-                        right: 0,
-                        flexDirection: 'column',
-                        backgroundColor: 'white',
-                        padding: '1rem',
-                        boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-                        zIndex: 50,
-                    }
-                }}>
-                    <ul style={{
-                        display: 'flex',
-                        listStyle: 'none',
-                        margin: 0,
-                        padding: 0,
-                        '@media (max-width: 768px)': {
-                            flexDirection: 'column',
-                            width: '100%',
-                        }
-                    }}>
+                {/* Desktop/Mobile Navigation */}
+                <div style={mobileMenuStyle}>
+                    <ul style={navListStyle}>
                         <li>
                             <Link to="/" style={{
                                 color: '#333',
@@ -138,9 +248,6 @@ const MyNavbar = () => {
                                 fontSize: '0.95rem',
                                 fontWeight: '500',
                                 transition: 'color 0.2s',
-                                ':hover': {
-                                    color: 'var(--accent, #4a90e2)',
-                                }
                             }}>
                                 Home
                             </Link>
@@ -154,9 +261,6 @@ const MyNavbar = () => {
                                 fontSize: '0.95rem',
                                 fontWeight: '500',
                                 transition: 'color 0.2s',
-                                ':hover': {
-                                    color: 'var(--accent, #4a90e2)',
-                                }
                             }}>
                                 Categories
                             </Link>
@@ -172,9 +276,6 @@ const MyNavbar = () => {
                                         fontSize: '0.95rem',
                                         fontWeight: '500',
                                         transition: 'color 0.2s',
-                                        ':hover': {
-                                            color: 'var(--accent, #4a90e2)',
-                                        }
                                     }}>
                                         Add Listing
                                     </Link>
@@ -188,9 +289,6 @@ const MyNavbar = () => {
                                         fontSize: '0.95rem',
                                         fontWeight: '500',
                                         transition: 'color 0.2s',
-                                        ':hover': {
-                                            color: 'var(--accent, #4a90e2)',
-                                        }
                                     }}>
                                         Orders
                                     </Link>
@@ -199,46 +297,16 @@ const MyNavbar = () => {
                         )}
                     </ul>
                     
-                    {/* Search Icon - Desktop */}
-                    <div 
-                        ref={searchRef} 
-                        style={{
-                            position: 'relative',
-                            marginLeft: '1rem',
-                            display: 'flex',
-                            alignItems: 'center',
-                            '@media (max-width: 768px)': {
-                                marginLeft: 0,
-                                width: '100%',
-                                marginTop: '0.5rem',
-                                marginBottom: '0.5rem',
-                            }
-                        }}
-                    >
-                        {/* On mobile, show full search bar instead of icon */}
+                    {/* Search Icon and Input */}
+                    <div ref={searchRef} style={searchContainerStyle}>
                         <div style={{
                             display: 'flex',
-                            width: '100%',
-                            '@media (min-width: 769px)': {
-                                width: 'auto',
-                            }
+                            width: isMobile ? '100%' : 'auto',
                         }}>
                             {/* Desktop search icon */}
                             <button 
                                 onClick={() => setIsSearchVisible(!isSearchVisible)} 
-                                style={{
-                                    background: 'none',
-                                    border: 'none',
-                                    cursor: 'pointer',
-                                    padding: '8px',
-                                    color: '#333',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    '@media (max-width: 768px)': {
-                                        display: 'none',
-                                    }
-                                }}
+                                style={desktopSearchIconStyle}
                             >
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" 
                                     strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -250,13 +318,7 @@ const MyNavbar = () => {
                             {/* Mobile search bar */}
                             <form 
                                 onSubmit={handleSearch}
-                                style={{
-                                    display: 'none',
-                                    '@media (max-width: 768px)': {
-                                        display: 'flex',
-                                        width: '100%',
-                                    }
-                                }}
+                                style={mobileSearchFormStyle}
                             >
                                 <input 
                                     type="text"
@@ -292,127 +354,77 @@ const MyNavbar = () => {
                         </div>
                         
                         {/* Desktop search dropdown */}
-                        {isSearchVisible && (
-                            <form 
-                                onSubmit={handleSearch}
+                        <form 
+                            onSubmit={handleSearch}
+                            style={desktopSearchDropdownStyle}
+                        >
+                            <input 
+                                type="text"
+                                placeholder="Search books..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
                                 style={{
-                                    position: 'absolute',
-                                    top: '100%',
-                                    right: '0',
-                                    backgroundColor: 'white',
-                                    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+                                    padding: '0.75rem',
+                                    border: '1px solid #e2e8f0',
                                     borderRadius: '4px',
-                                    padding: '0.5rem',
-                                    width: '260px',
-                                    zIndex: 100,
-                                    display: 'flex',
-                                    '@media (max-width: 768px)': {
-                                        display: 'none',
-                                    }
+                                    width: '100%',
+                                    fontSize: '0.9rem',
+                                }}
+                                autoFocus
+                            />
+                            <button 
+                                type="submit"
+                                style={{
+                                    background: 'var(--accent, #4a90e2)',
+                                    border: 'none',
+                                    color: 'white',
+                                    padding: '0 0.75rem',
+                                    borderRadius: '4px',
+                                    marginLeft: '0.5rem',
+                                    cursor: 'pointer',
                                 }}
                             >
-                                <input 
-                                    type="text"
-                                    placeholder="Search books..."
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    style={{
-                                        padding: '0.75rem',
-                                        border: '1px solid #e2e8f0',
-                                        borderRadius: '4px',
-                                        width: '100%',
-                                        fontSize: '0.9rem',
-                                    }}
-                                    autoFocus
-                                />
-                                <button 
-                                    type="submit"
-                                    style={{
-                                        background: 'var(--accent, #4a90e2)',
-                                        border: 'none',
-                                        color: 'white',
-                                        padding: '0 0.75rem',
-                                        borderRadius: '4px',
-                                        marginLeft: '0.5rem',
-                                        cursor: 'pointer',
-                                    }}
-                                >
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" 
-                                        strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                        <polyline points="9 18 15 12 9 6"></polyline>
-                                    </svg>
-                                </button>
-                            </form>
-                        )}
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" 
+                                    strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <polyline points="9 18 15 12 9 6"></polyline>
+                                </svg>
+                            </button>
+                        </form>
                     </div>
                     
                     {/* User Authentication Section */}
-                    <div style={{
-                        marginLeft: '1rem',
-                        position: 'relative',
-                        '@media (max-width: 768px)': {
-                            marginLeft: 0,
-                            width: '100%',
-                        }
-                    }} ref={dropdownRef}>
+                    <div style={authContainerStyle} ref={dropdownRef}>
                         {firebase.isLoggedIn ? (
                             <>
                                 <button 
                                     onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                                    style={{
-                                        background: 'none',
-                                        border: 'none',
-                                        color: '#333',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        cursor: 'pointer',
-                                        padding: '0.5rem 0.75rem',
-                                        borderRadius: '4px',
-                                        fontSize: '0.95rem',
-                                        fontWeight: '500',
-                                        transition: 'background-color 0.2s',
-                                        ':hover': {
-                                            backgroundColor: 'rgba(0, 0, 0, 0.05)',
-                                        },
-                                        '@media (max-width: 768px)': {
-                                            width: '100%',
-                                            justifyContent: 'space-between',
-                                            borderTop: '1px solid #edf2f7',
-                                            marginTop: '0.5rem',
-                                            paddingTop: '1rem',
-                                        }
-                                    }}
+                                    style={userProfileButtonStyle}
                                 >
                                     <div style={{
                                         display: 'flex',
                                         alignItems: 'center',
                                         overflow: 'hidden',
                                     }}>
-                                        {(
-                                            <div style={{
-                                                width: '32px',
-                                                height: '32px',
-                                                borderRadius: '50%',
-                                                backgroundColor: 'var(--accent, #4a90e2)',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center',
-                                                marginRight: '0.75rem',
-                                                color: 'white',
-                                                fontWeight: 'bold',
-                                                flexShrink: 0,
-                                            }}>
-                                                {user?.email?.charAt(0).toUpperCase()}
-                                            </div>
-                                        )}
+                                        <div style={{
+                                            width: '32px',
+                                            height: '32px',
+                                            borderRadius: '50%',
+                                            backgroundColor: 'var(--accent, #4a90e2)',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            marginRight: '0.75rem',
+                                            color: 'white',
+                                            fontWeight: 'bold',
+                                            flexShrink: 0,
+                                        }}>
+                                            {user?.email?.charAt(0).toUpperCase()}
+                                        </div>
                                         <span style={{
-                                            maxWidth: '120px',
+                                            maxWidth: isMobile ? '200px' : '120px',
                                             whiteSpace: 'nowrap',
                                             overflow: 'hidden',
                                             textOverflow: 'ellipsis',
-                                            '@media (max-width: 768px)': {
-                                                maxWidth: '200px',
-                                            }
                                         }}>
                                             {user?.displayName || user?.email}
                                         </span>
@@ -432,83 +444,47 @@ const MyNavbar = () => {
                                     </svg>
                                 </button>
                                 
-                                {isDropdownOpen && (
-                                    <div style={{
-                                        position: 'absolute',
-                                        top: '100%',
-                                        right: 0,
-                                        backgroundColor: 'white',
-                                        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-                                        borderRadius: '4px',
-                                        minWidth: '180px',
-                                        zIndex: 100,
-                                        '@media (max-width: 768px)': {
-                                            position: 'relative',
-                                            boxShadow: 'none',
-                                            width: '100%',
-                                            marginTop: '0.5rem',
-                                        }
+                                <div style={userDropdownStyle}>
+                                    <Link to="/account" style={{
+                                        display: 'block',
+                                        padding: '0.75rem 1rem',
+                                        color: '#333',
+                                        textDecoration: 'none',
+                                        borderBottom: '1px solid #f1f5f9',
+                                        fontSize: '0.9rem',
                                     }}>
-                                        <Link to="/account" style={{
+                                        My Account
+                                    </Link>
+                                    <Link to="/my-books" style={{
+                                        display: 'block',
+                                        padding: '0.75rem 1rem',
+                                        color: '#333',
+                                        textDecoration: 'none',
+                                        borderBottom: '1px solid #f1f5f9',
+                                        fontSize: '0.9rem',
+                                    }}>
+                                        My Books
+                                    </Link>
+                                    <button 
+                                        onClick={handleLogout}
+                                        style={{
                                             display: 'block',
+                                            width: '100%',
+                                            textAlign: 'left',
                                             padding: '0.75rem 1rem',
-                                            color: '#333',
-                                            textDecoration: 'none',
-                                            borderBottom: '1px solid #f1f5f9',
+                                            color: '#e53e3e',
+                                            backgroundColor: 'transparent',
+                                            border: 'none',
+                                            cursor: 'pointer',
                                             fontSize: '0.9rem',
-                                            ':hover': {
-                                                backgroundColor: '#f8fafc',
-                                            }
-                                        }}>
-                                            My Account
-                                        </Link>
-                                        <Link to="/my-books" style={{
-                                            display: 'block',
-                                            padding: '0.75rem 1rem',
-                                            color: '#333',
-                                            textDecoration: 'none',
-                                            borderBottom: '1px solid #f1f5f9',
-                                            fontSize: '0.9rem',
-                                            ':hover': {
-                                                backgroundColor: '#f8fafc',
-                                            }
-                                        }}>
-                                            My Books
-                                        </Link>
-                                        <button 
-                                            onClick={handleLogout}
-                                            style={{
-                                                display: 'block',
-                                                width: '100%',
-                                                textAlign: 'left',
-                                                padding: '0.75rem 1rem',
-                                                color: '#e53e3e',
-                                                backgroundColor: 'transparent',
-                                                border: 'none',
-                                                cursor: 'pointer',
-                                                fontSize: '0.9rem',
-                                                ':hover': {
-                                                    backgroundColor: '#f8fafc',
-                                                }
-                                            }}
-                                        >
-                                            Logout
-                                        </button>
-                                    </div>
-                                )}
+                                        }}
+                                    >
+                                        Logout
+                                    </button>
+                                </div>
                             </>
                         ) : (
-                            <div style={{
-                                display: 'flex',
-                                gap: '0.5rem',
-                                '@media (max-width: 768px)': {
-                                    width: '100%',
-                                    justifyContent: 'space-between',
-                                    marginTop: '1rem',
-                                    borderTop: '1px solid #edf2f7',
-                                    paddingTop: '1rem',
-                                }
-                            }}>
+                            <div style={guestAuthButtonsStyle}>
                                 <Link 
                                     to="/login"
                                     style={{
@@ -519,14 +495,8 @@ const MyNavbar = () => {
                                         textDecoration: 'none',
                                         fontSize: '0.9rem',
                                         fontWeight: '500',
-                                        transition: 'all 0.2s',
-                                        ':hover': {
-                                            backgroundColor: 'rgba(74, 144, 226, 0.1)',
-                                        },
-                                        '@media (max-width: 768px)': {
-                                            flex: 1,
-                                            textAlign: 'center',
-                                        }
+                                        flex: isMobile ? 1 : 'none',
+                                        textAlign: isMobile ? 'center' : 'left',
                                     }}
                                 >
                                     Sign In
@@ -541,14 +511,8 @@ const MyNavbar = () => {
                                         textDecoration: 'none',
                                         fontSize: '0.9rem',
                                         fontWeight: '500',
-                                        transition: 'all 0.2s',
-                                        ':hover': {
-                                            backgroundColor: '#3a7bc2',
-                                        },
-                                        '@media (max-width: 768px)': {
-                                            flex: 1,
-                                            textAlign: 'center',
-                                        }
+                                        flex: isMobile ? 1 : 'none',
+                                        textAlign: isMobile ? 'center' : 'left',
                                     }}
                                 >
                                     Sign Up
