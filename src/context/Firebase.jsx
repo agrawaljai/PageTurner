@@ -39,44 +39,45 @@ export const FirebaseProvider = (props) => {
     const signinUserWithEmailAndPassword = (email, password) => signInWithEmailAndPassword(firebaseAuth, email, password);
     const signinWithGoogle = () => signInWithPopup(firebaseAuth, googleProvider);
 
-    // Modify the handleCreateNewListing function to use Cloudinary for image upload
-    const handleCreateNewListing = async(name, isbn, price, cover, category = "Fiction") => {
-        try {
-            setIsSubmitting(true);
+    // Update the handleCreateNewListing function in your Firebase.js context file
 
-            // Create FormData to send image as multipart/form-data to Cloudinary
-            const formData = new FormData();
-            formData.append("file", cover); // Append the cover image
-            formData.append("upload_preset", "book_covers"); // Cloudinary preset (create this in Cloudinary console)
+    const handleCreateNewListing = async(name, isbn, price, coverFile, category = "Fiction") => {
+    try {
+        setIsSubmitting(true);
 
-            // Send image to Cloudinary and get the response
-            const response = await axios.post("https://api.cloudinary.com/v1_1/dvbty9y9x/image/upload", formData);
+        // Create FormData to send image as multipart/form-data to Cloudinary
+        const formData = new FormData();
+        formData.append("file", coverFile); // Append the cover image
+        formData.append("upload_preset", "book_covers"); // Cloudinary preset
 
-            if (response.status === 200) {
-                const imageUrl = response.data.secure_url; // Get image URL from Cloudinary response
+        // Send image to Cloudinary and get the response
+        const response = await axios.post("https://api.cloudinary.com/v1_1/dvbty9y9x/image/upload", formData);
 
-                // Store the new book data in Firestore
-                const result = await addDoc(collection(firestore, 'books'), {
-                    name,
-                    isbn,
-                    price,
-                    category,
-                    imageURL: imageUrl, // Store Cloudinary image URL
-                    userID: user.uid,
-                    userEmail: user.email,
-                    displayName: user.displayName,
-                    photoURL: user.photoURL,
-                    createdAt: new Date().toISOString()
-                });
-                setIsSubmitting(false);
-                return result;
-            } else {
-                throw new Error("Image upload failed");
-            }
-        } catch (error) {
-            setIsSubmitting(false);
-            throw error;
+        if (response.status === 200) {
+            const imageUrl = response.data.secure_url; // Get image URL from Cloudinary response
+
+            // Store the new book data in Firestore
+            const result = await addDoc(collection(firestore, 'books'), {
+                name,
+                isbn,
+                price,
+                category,
+                imageURL: imageUrl, // Store Cloudinary image URL
+                userID: user.uid,
+                userEmail: user.email,
+                displayName: user.displayName,
+                photoURL: user.photoURL,
+                createdAt: new Date().toISOString()
+            });
+            return result;
+        } else {
+            throw new Error("Image upload failed");
         }
+    } catch (error) {
+        throw error;
+    } finally {
+        setIsSubmitting(false);
+    }
     };
 
     const handleDeleteListing = async(id) => {
